@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+
+<head>
+    <script src="./slides.js" type="module" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="slides.css"></style>
+    <link rel="stylesheet" href="scala.css"></style>
+
+    <!-- Katex -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.45/dist/katex.min.css" integrity="sha384-UA8juhPf75SzzAMA/4fo3yOU7sBJ0om7SCD2GHq0fZqZco6tr1UCV7nUbk9J90JM" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.45/dist/katex.min.js" integrity="sha384-Tt7wBxLKwSzFVRET4O4U9H6v8MNaQ/CjN2FMP4xFm0ErrFu6aNqoonRVW5W40iGI" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.45/dist/contrib/auto-render.min.js" integrity="sha384-bjyGPfbij8/NDKJhSGZNP/khQVgtHUE5exjm4Ydllo42FwIgYsdLO2lXGmRBf5Mz" crossorigin="anonymous"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+            delimiters: [
+                {left: '$$', right: '$$', display: true},
+                {left: '$', right: '$', display: false},
+                {left: '\\(', right: '\\)', display: false},
+                {left: '\\[', right: '\\]', display: true}
+            ],
+            throwOnError : false
+            });
+        });
+    </script>
+
+    <title>An Introduction to Generalized Algebraic Datatypes</title>
+
+</head>
+
+<body style="padding:0;margin:0;background-color: black; height: 100vh; width: 100vw; position: absolute">
+    <div id="slides" class="presentation">
+
+        <article class="slides-title">
+            <div class="title-block">
+                <h2>An Introduction to</h2>
+                <h1>Generalized Algebraic Datatypes</h1>
+                <hr class="rule"/>
+                <span>
+                    <a href="https://ef5.ch" target="_blank" rel="speaker" data-var="speaker" style="color: inherit; text-decoration: inherit;"></a>
+                </span>
+            </div>
+        </article>
+
+        <article>
+            <header><h1>What is a (Generalized) Algebraic Datatype?</h1></header>
+            <main class="signposting">
+                <div>
+                    End goal: <em>Generalized Algebraic Datatypes</em> (GADTs)
+                    <ul data-from="1" data-action="reveal">
+                        <li>What are they?</li>
+                        <li>How do you use them?</li>
+                        <li>What are they good for?</li>
+                    </ul>
+                </div>
+
+                <div data-from="2" data-action="reveal">
+                    But before that: what even are <em>Algebraic Datatypes</em> (ADTs)?
+                </div>
+
+            </main>
+            <footer></footer>
+        </article>
+
+        <article class="slides-standout">
+            <h1>Algebraic Datatypes</h1>
+        </article>
+
+        <article>
+            <header><h1>A Motivating Example: (Binary) Trees</h1></header>
+            <main>
+                Let's start with some (live-) coding!
+
+                <div data-from="1" data-action="show">
+                    Our case study will be <em>full binary trees</em>:
+                    <div style="display: flex; flex-direction: column; align-items: center;">
+<pre>
+    +
+   / \
+  +  31
+ / \
+17  +
+   / \
+  23 27
+</pre>
+                </div>
+                i.e., binary trees such that each node has 0 or 2 children (but never 1).
+                </div>
+            </main>
+            <footer></footer>
+        </article>
+
+        <article>
+            <header><h1>Trees: Failures & Successes</h1></header>
+            <main class="signposting">
+                <div>
+                    Three versions:
+                    <ul>
+                        <li data-from="1" data-action="show">Full OOP (dynamic dispatch) <span class="comment" data-from="2" data-action="show">Unsafe APIs</span></li>
+                        <li data-from="3" data-action="show">Pattern-matching OOP (type tests) <span class="comment" data-from="4" data-action="show">No exhaustiveness checking</span></li>
+                        <li data-from="5" data-action="show">Algebraic Datatypes</li>
+                    </ul>
+                </div>
+
+                <div class="slides-overlay sidebox bot">
+                    <div class="insight" data-from="6" data-action="show">
+                        <strong>Food for thoughts:</strong><br/>
+                        Some languages do not allow type tests
+                    </div>
+                </div>
+            </main>
+            <footer></footer>
+        </article>
+
+        <article>
+            <header><h1>Anatomy of an ADT</h1></header>
+            <main>
+<pre><code><span class="scala-comment">//   ↓ Name of the defined type</span>
+<span class="scala-kw">enum</span> List [T] <span class="scala-comment">// ← Type parameter(s)</span>
+  <span class="scala-comment">//   ↓ Constructor name(s)</span>
+  <span class="scala-kw">case</span> Nil ()                   <span data-from="3" data-to="3" data-action="backlight"><span class="scala-kw">extends</span> List[T]</span>
+  <span class="scala-kw">case</span> Cons(h: T, t: List[T])   <span data-from="3" data-to="3" data-action="backlight"><span class="scala-kw">extends</span> List[T]</span>
+  <span class="scala-comment">//       ↑ Constructor(s)' payload</span>
+</code></pre>
+
+                <div data-from="1" data-action="show">
+                    Or, in plain english:
+
+                    <div class="cite">
+                        A <code>List</code> of <code data-from="2" data-to="2" data-action="backlight">T</code>s is <strong>either</strong>:
+                        <ol>
+                            <li>a <code>Nil</code>, made out of "nothing"</li>
+                            <li>a <code>Cons</code>, made out of a <code>T</code> <strong>and</strong> a <code data-from="2" data-to="2" data-action="backlight">List[T]</code></li>
+                        </ol>
+                        and <strong>cannot be anything else</strong>.
+                    </div>
+                </div>
+
+                <div class="slides-overlay sidebox">
+                    <div data-from="2" data-action="reveal" class="attention">
+                        Recursive & Parametric!
+                    </div>
+
+                    <div style="height: 3em; visibility: hidden;">
+
+                    </div>
+
+                    <div data-from="3" data-action="reveal" class="attention">
+                        Often optional (more on that later...)
+                    </div>
+
+                    <div data-from="4" data-action="reveal" class="insight">
+                        Finite list of constructors ⟹<br/>
+                        patterns can be checked for exhaustiveness
+                    </div>
+                </div>
+            </main>
+            <footer></footer>
+        </article>
+
+        <article>
+            <header><h1>Some More Examples of ADTs</h1></header>
+            <main>
+
+                <div style="display: flex; flex-direction: row; gap: 1em">
+<pre><code><span class="scala-kw">enum</span> Bool {
+  <span class="scala-kw">case</span> True()
+  <span class="scala-kw">case</span> False()
+}
+</code></pre>
+<pre><code><span class="scala-kw">enum</span> Pair[S,T] {
+  <span class="scala-kw">case</span> Pack(s: S, t: T)
+}
+</code></pre>
+<pre><code><span class="scala-kw">enum</span> Option[T] {
+  <span class="scala-kw">case</span> None()
+  <span class="scala-kw">case</span> Some(t: T)
+}
+</code></pre>
+                </div>
+<pre data-from="1" data-action="show"><code><span class="scala-kw">enum</span> Json { <span class="scala-comment">// Inspired by the circe library</span>
+  <span class="scala-kw">case</span> JNull
+  <span class="scala-kw">case</span> JBool(b: Boolean)
+  <span class="scala-kw">case</span> JNumber(n: java.math.BigDecimal)
+  <span class="scala-kw">case</span> JString(s: String)
+  <span class="scala-kw">case</span> JArray(a: Array[Json])
+  <span class="scala-kw">case</span> JObject(m: Map[String, Json])
+}
+</code></pre>
+
+            </main>
+            <footer></footer>
+        </article>
+
+
+        <article>
+            <header><h1>Pattern Matching: So Good Everyone Wants It</h1></header>
+            <main>
+                <div>
+                    Pattern matching used to be limited to functional languages, but...
+                    <ul>
+                        <li data-from="1" data-action="reveal">
+                            <a href="https://doc.rust-lang.org/book/ch06-01-defining-an-enum.html" target="_blank"><strong>Rust</strong></a>:
+                            <br/>
+                            "enums" & pattern matching
+                            <span class="comment">Since release (2012)</span>
+                        </li>
+                        <li data-from="2" data-action="reveal">
+                            <a href="https://peps.python.org/pep-0636/" target="_blank"><strong>Python</strong></a>:
+                            <br/>
+                            Structural pattern matching
+                            <span class="comment">Since Python 3.10 (2021)</span>
+                        </li>
+                        <li data-from="3" data-action="reveal">
+                            <a href="https://docs.oracle.com/en/java/javase/25/language/pattern-matching.html" target="_blank"><strong>Java</strong></a>:
+                            <br/>
+                            "sealed" class hierarcies & "switch"
+                            <span class="comment">Since Java21 (2023)</span>
+                        </li>
+                        <li data-from="4" data-action="reveal">
+                            <a href="https://isocpp.org/files/papers/P2688R2.html"  target="_blank"><strong>C++</strong></a>:
+                            <br/>
+                            "In discussion" since (at least) 2014
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="slides-overlay sidebox" style="top: unset; bottom: 2em">
+                    <div class="attention" data-from="6" data-action="reveal">
+                        Even if you don't buy into ADTs:<br/>
+                        Please give pattern matching a try
+                    </div>
+
+                    <div class="attention" data-from="5" data-action="reveal">
+                        ADTs may not be <strong>required</strong> for pattern matching,<br/>
+                        but they are what makes it <strong>type-safe</strong>.
+                    </div>
+                </div>
+            </main>
+            <footer data-from="5" data-action="reveal">
+                <hr/>
+                <strong>Type safety:</strong> things do not go wrong at runtime (i.e., no exceptions)
+            </footer>
+        </article>
+
+        <article>
+            <header><h1>Beyond Appearances: ADTs for Performance</h1></header>
+            <main>
+                We have three implementations; which one is the fastest?
+
+                <table data-from="1" data-action="reveal">
+                    <tr class="table-hhead">
+                        <th>Implementation</th>
+                        <th>Throughput (ops/s)</th>
+                        <th>Error (ops/s)</th>
+                    </tr>
+                    <tr data-from="2" data-action="reveal">
+                        <td>OOP</td>
+                        <td>123.653</td>
+                        <td><span style="visibility: hidden;">00</span>1.670</td>
+                    </tr>
+                    <tr data-from="2" data-action="reveal">
+                        <td>Type Test</td>
+                        <td>137.381</td>
+                        <td><span style="visibility: hidden;">00</span>9.841</td>
+                    </tr>
+                    <tr data-from="2" data-action="reveal">
+                        <td>ADT</td>
+                        <td>157.312</td>
+                        <td><span style="visibility: hidden;">0</span>10.850</td>
+                    </tr>
+                </table>
+
+
+                <div style="height:2em"></div>
+                <p data-from="1" data-action="show">
+                    <strong>Throughput:</strong> "How many times can the function run in a second." <br/>
+                    <strong>Error:</strong> "How much the result varies if we repeat the experiment."
+                </p>
+            </main>
+            <footer></footer>
+        </article>
+
+        <article>
+            <header><h1>A Tangent Before Moving On: What Makes Them "Algebraic"</h1></header>
+            <main>
+                Why not just call them "fancy enums"?
+<pre><code><span class="scala-kw">enum</span> Tree[X] {
+  <span class="scala-kw">case</span> Leaf(v: X)                     <span class="scala-kw">extends</span> Tree[X]
+  <span class="scala-kw">case</span> Fork(l: Tree[X], r: Tree[X])   <span class="scala-kw">extends</span> Tree[X]
+}
+</code></pre>
+
+                <div style="display: flex; justify-content: center;">
+                    <code data-from="1" data-to="1" data-action="show">Tree(X) = Leaf(v: X) <strong>"or"</strong> Fork(l: Tree[X] <strong>"and"</strong> r: Tree[X])</code>
+
+                    <code data-from="2" data-to="2" data-action="show">Tree(X) = L(x: X) <strong>"or"</strong> F(t1: Tree[X] <strong>"and"</strong> t2: Tree[X])</code>
+
+                    <code data-from="3" data-to="3" data-action="show">Tree(X) = (X) <strong>"or"</strong> (Tree[X] <strong>"and"</strong> Tree[X])</code>
+
+                    <code data-from="4" data-action="show">Tree(X) = (X) + (Tree[X] * Tree[X])</code>
+                </div>
+
+                <div data-from="5" data-action="show">$$T(X) = X + T(X) \cdot T(X) $$</div>
+
+                <div data-from="6" data-action="show">
+                    Seems like algebra to me... and more specifically: a sum of products.
+                </div>
+                <div data-from="7" data-action="show">
+                    That might seem like symbol pushing, but the connection is more than syntactic.
+                </div>
+            </main>
+            <footer></footer>
+        </article>
+
+        <article>
+            <header><h1>ADTs: Summary</h1></header>
+            <main>
+                Algebraic Datatypes (ADTs):
+                <ul>
+                    <li>Allow to represent finite/closed hierarchies.</li>
+                    <li>Naturally support pattern matching extremely well.</li>
+                    <li>Readily available (Rust, Scala, Java, etc.).</li>
+                    <li>Fairly efficient.</li>
+                </ul>
+            </main>
+            <footer></footer>
+        </article>
+
+        <article class="slides-standout">
+            <div class="title-block">
+                <h2>An Introduction to</h2>
+                <h1>Generalized Algebraic Datatypes</h1>
+            </div>
+        </article>
+
+        <article>
+            <header><h1>GADTs: Generalizing by Constraining</h1></header>
+            <main>
+                <p>
+                    <em><strong>Generalized</strong> Algebraic Datatypes</em>: What is there to generalize?<br/>
+                    <span data-from="1" data-action="reveal">From the <a href="https://docs.scala-lang.org/scala3/book/types-adts-gadts.html#generalized-algebraic-datatypes-gadts" target="_blank">Scala documentation</a>:</span>
+                </p>
+
+<pre data-from="1" data-action="reveal"><code><span class="scala-kw">enum</span> Box[T] {
+  <span class="scala-kw">case</span> IntBox(n: Int)       <span class="scala-kw">extends</span> <span data-from="3" data-to="3" data-action="backlight">Box[Int]</span>
+  <span class="scala-kw">case</span> BoolBox(b: Boolean)  <span class="scala-kw">extends</span> <span data-from="3" data-to="3" data-action="backlight">Box[Boolean]</span>
+}
+</code></pre>
+
+                <p data-from="2" data-action="reveal">
+                    I was <em><strong>very</strong></em> confused the first time I saw that example...
+                </p>
+                <p data-from="3" data-action="reveal">
+                    The important part is that, unlike all of our previous examples,
+                    the extended type is not <code>Box[T]</code>,
+                    but <code>Box</code> instantiated with a concrete type,
+                    either <code>Int</code> or <code>Boolean</code>.
+                </p>
+
+                <div class="slides-overlay sidebox">
+                    <div class="attention" data-from="4" data-action="reveal">
+                        Subsidiary question:<br/>
+                        Why would you want to do that?
+                    </div>
+                </div>
+            </main>
+            <footer></footer>
+        </article>
+
+        <article>
+            <header><h1>An Example to Motivate GADTs</h1></header>
+            <main>
+                <p>
+                    Rather than try to explain what GADTs are outright,
+                    let's answer another question,
+                    that will naturally lead us to GADTs.
+                </p>
+
+                <p data-from="1" data-action="show">
+                    So anyway: how big is a <code>Boolean</code>?
+                </p>
+
+
+                <p data-from="2" data-action="show">
+                    <strong>Empirical Answer:</strong> 8 Bits!
+                </p>
+            </main>
+            <footer></footer>
+        </article>
+
+        <article>
+            <header><h1>A Tangent: Booleans Are 8bits Big?!?</h1></header>
+            <main>
+                From the JVM's specification:
+                <img src="bool_jvm.png" style="max-width: 100%; max-height: 100%;"/>
+
+                <div class="slides-overlay sidebox" style="top: 4em">
+                    <div class="aside" data-from="1" data-action="show" style="width: 70%;">
+                        Also (somewhat) true in C:
+                        <img src="bool_c.png" style="width: 100%;"/>
+                    </div>
+                </div>
+            </main>
+            <footer></footer>
+        </article>
+
+        <article>
+            <header><h1>GADTs: Generalizing by Constraining (Redux)</h1></header>
+            <main>
+<pre><code><span class="scala-kw">enum</span> SmartArray[T] {
+  <span class="scala-kw">case</span> Default(array: Array[T])     <span class="scala-kw">extends</span> SmartArray[T]
+  <span class="scala-kw">case</span> Compact(array: CompactArray) <span class="scala-kw">extends</span> SmartArray[Boolean]
+}
+</code></pre>
+
+                <p>
+                    <strong>tldr;</strong> GADTs allow some constructors to <em>restrict</em>
+                    the instantiation of the type parameter to a specific type.
+                </p>
+
+                <p>
+                    Case in point: <code>Compact</code> requires
+                    <code>SmartArray</code>'s type parameter to be <code>Boolean</code>.
+                </p>
+
+            </main>
+            <footer></footer>
+        </article>
+
+        <article>
+            <header><h1>Compact Arrays: Not a Made Up Usecase</h1></header>
+            <main>
+                <p>
+                    This example was adapted from a Jane Street blog post (about OCaml).
+                </p>
+
+                <div class="cite" data-from="1" data-action="show">
+                    As I said at the beginning, this is really just an example of the more general theme.
+                    GADTs [..];
+                    they’re a powerful mechanism for building easy to use abstractions that give you more precise control of your memory representation.
+                    And getting the right memory representation is often critical for building high performance applications.
+                </div>
+            </main>
+            <footer>
+                <hr/>
+                <a href="https://blog.janestreet.com/why-gadts-matter-for-performance/" target="_blank">
+                Minsky Y. Why GADTS matter for performance. Jane Street Blog. (2015)
+                </a>
+            </footer>
+        </article>
+
+        <article class="slides-standout">
+            <div class="title-block">
+                <h2>A Case Study on</h2>
+                <h1>Generalized Algebraic Datatypes</h1>
+            </div>
+        </article>
+
+        <article>
+            <header><h1>A Refresher(?) on Red-Black Trees</h1></header>
+            <main>
+                <div>
+                    <p>
+                        <em>Red-Black Tree</em>s are <em>(approximately) balanced binary search trees</em>.
+                    </p>
+
+                    <p>
+                        They guarante a complexity of $\log(n)$ for all basic operations:
+                        <ul class="compact-list">
+                            <li>insertion</li>
+                            <li>deletion</li>
+                            <li>membership-test</li>
+                        </ul>
+                    </p>
+                </div>
+
+                <img data-from="1" data-action="show" src="red_black.png" style="width:70%; align-self: center;" />
+
+            </main>
+            <footer>
+                <hr/>
+                <span style="font-size: 0.9em;">
+                Cormen, T. H., Leiserson, C. E., Rivest, R. L., & Stein, C. Introduction to algorithms. MIT press (2002).
+                </span>
+            </footer>
+        </article>
+
+        <article>
+            <header><h1>GADTs as Lightweight Verification</h1></header>
+            <main style="gap: 0em; padding-bottom: 0;">
+                <div>
+                    The approximate balanced part is achieved by maintaining 5 invariants:
+                    <ol data-from="1" data-action="reveal" style="margin-top: 0; margin-bottom: 0;">
+                        <li>Every node is either <span style="font-weight: bold; color: red">Red</span> or <span style="font-weight: bold; color: Black">Black</span>;</li>
+                        <li>The root is <span style="font-weight: bold; color: black">Black</span>;</li>
+                        <li>Every leaf is <span style="font-weight: bold; color: black">Black</span>;</li>
+                        <li>If a node is <span style="font-weight: bold; color: red">Red</span>, then both its children are <span style="font-weight: bold; color: black">Black</span>;</li>
+                        <li data-from="2" data-action="fade">For each node, all simple paths from the node to descendant leaves contain the same number of <span style="font-weight: bold; color: black">Black</span> nodes.</li>
+                    </ol>
+                </div>
+
+                <img src="red_black.png" style="width:70%; align-self: center;" />
+
+                <div class="slides-overlay sidebox bot">
+                    <div class="attention" data-from="3" data-action="show">
+                        Interested in a complete implementation (in Haskell)?<br/>
+                        Give UPenn's CIS5520 lecture notes a read.
+                    </div>
+                </div>
+            </main>
+            <footer data-from="3" data-action="reveal">
+                <hr/>
+                <a href="https://www.seas.upenn.edu/~cis5520/24fa/schedule.html" target="_blank" style="font-size: 0.9em;">
+                    Weirich, S. Advanced Programming - Red Black Trees (with GADTs). University of Pennsylvania (2024).
+                </a>
+            </footer>
+        </article>
+        <article>
+            <header><h1>A Scala Oddity: ADTs Declare Many Types</h1></header>
+            <main>
+<pre data-from="1" data-action="show"><code><span class="scala-kw">enum</span> Color { <span class="scala-comment">// Declares 3 types: Color, Red, Black</span>
+  <span class="scala-kw">case</span> Red()
+  <span class="scala-kw">case</span> Black()
+}
+
+<span class="scala-kw">val</span> _: Color = Red()
+<span class="scala-kw">val</span> _: Red = Red()
+<span style="text-decoration: red wavy underline 2px;"><span class="scala-kw">val</span> _: Black = Red()</span> <span class="scala-comment">// Type error</span>
+<span class="scala-kw">val</span> _ = Red() <span class="scala-comment">// Type defaults to Color</span>
+</code></pre>
+<pre data-from="2" data-action="show">
+Red ───╼<:╾┐
+           ├─ Color
+Black ─╼<:╾┘
+</pre>
+                <div class="slides-overlay sidebox bot">
+                    <div class="insight" data-from="2" data-action="show">
+                        <code><:</code> is the Scala symbol for "subtype"
+                    </div>
+                </div>
+            </main>
+            <footer></footer>
+        </article>
+
+        <article>
+            <header><h1>GADTs: Summary</h1></header>
+            <main>
+                Generalized Algebraic Datatypes (GADTs):
+                <ul>
+                    <li>Generalize ADTs by allowing constructors to restrict the instantiation of type parameters.</li>
+                    <li>
+                        Seen two use cases:
+                        <ul>
+                            <li>Control over data representation (Compact Boolean Arrays).</li>
+                            <li>Lightweight verification (Red-Black Tree).</li>
+                        </ul>
+
+                    </li>
+                </ul>
+            </main>
+            <footer></footer>
+        </article>
+
+        <article class="slides-standout">
+            <h1>Backup</h1>
+        </article>
+
+        <article>
+            <header><h1>Null References: The Billion Dollar Mistake</h1></header>
+            <main>
+                <div class="cite">
+                    I call it my billion-dollar mistake.
+                    It was the invention of the null reference in 1965. [..]
+                </div>
+                <span class="citee">Tony Hoare, "inventor" of the null references/pointers</span>
+
+                <div data-from="1" data-action="show">
+                    Interestingly, they also mention:
+                    <div class="cite">
+                        The types of the pointer could then be implemented as a union of either a pointer to the null type, or a pointer to the type.
+                    </div>
+                </div>
+<pre data-from="2" data-action="show"><code>enum Option[T] {
+    case None(/*v: Null*/)
+    case Some(v: T)
+}
+</code></pre>
+            </main>
+            <footer>
+                <hr/>
+                <a href="https://www.infoq.com/presentations/Null-References-The-Billion-Dollar-Mistake-Tony-Hoare/" target="_blank">
+                    Hoare, T. Null References: The Billion Dollar Mistake. InfoQ (2009)
+                </a>
+            </footer>
+        </article>
+    </div>
+</body>

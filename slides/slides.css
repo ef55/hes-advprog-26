@@ -1,0 +1,340 @@
+:root {
+    --back-color: white;
+    --header-back-color: #1bb5b5;
+    --highlight-color: red;
+
+    --insight-color: rgb(139, 255, 255);
+    --attention-color: rgb(255, 146, 146);
+    --aside-color: rgb(255, 229, 181);
+    --code-bg-color: beige;
+    --cite-color: gray;
+}
+
+/* https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/Heading_Elements#specifying_a_uniform_font_size_for_h1 */
+/* Not used, but need to avoid warning. */
+:where(h1) {
+  margin-block: 0.67em;
+  font-size: 2em;
+}
+
+.slides-root {
+    container-name: slides;
+    font-family: 'Iosevka';
+    --aspect-ratio: 16/9;
+    width: 100%;
+    height: 100%;
+}
+
+.slides-root.presentation > :not(.slides-focus) {
+    display: none !important;
+}
+
+.slides-root {
+    container-type: size;
+    container-name: slide;
+}
+
+.slides-root > * {
+    aspect-ratio: var(--aspect-ratio);
+    position: relative;
+
+    overflow: hidden;
+
+    border: 1px solid black;
+    box-sizing: border-box;
+/*
+    display: flex;
+    flex-direction: column; */
+
+    background-color: var(--back-color);
+}
+.slides-root.presentation.width > * {
+    font-size: 2cqw;
+    width: 100%;
+    height: auto;
+}
+.slides-root.presentation.height > * {
+    font-size: calc(var(--aspect-ratio) * 2cqh);
+    width: auto;
+    height: 100%;
+}
+
+.slides-root.list > * {
+    font-size: 2cqw;
+    width: 100%;
+    height: auto;
+}
+
+*[data-action="show"]:not(.slides-focus) {
+    display: none !important;
+}
+
+*[data-action="reveal"]:not(.slides-focus) {
+    visibility: hidden;
+}
+
+*[data-action="highlight"].slides-focus {
+    color: var(--highlight-color);
+}
+
+*[data-action="backlight"].slides-focus {
+    background-color: rgba(255, 0, 0, 0.295);
+}
+
+*[data-action="err"].slides-focus {
+    text-decoration: var(--highlight-color) wavy underline 2px;
+}
+
+*[data-action="strike"].slides-focus {
+    text-decoration: line-through;
+}
+
+*[data-action="bold"].slides-focus {
+    font-weight: bold;
+}
+
+*[data-action="bold-highlight"].slides-focus {
+    color: var(--highlight-color);
+    font-weight: bold;
+}
+
+*[data-action="fade"].slides-focus {
+    opacity: 0.5;
+}
+
+.slides-root > * > * {
+    box-sizing: border-box;
+    padding-left: 1em;
+    padding-right: 1em;
+}
+
+.slides-root > * > header {
+    height: 10%;
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+    background-color: var(--header-back-color);
+}
+
+.slides-root > * > header > h1 {
+    font-size: 1.5em;
+    font-weight: bold;
+    margin: 0;
+}
+
+.slides-root > * > main {
+    height: 80%;
+
+    box-sizing: border-box;
+
+    display: flex;
+    flex-direction: column;
+    font-size: 1.25em;
+    gap: 0.5em;
+
+    padding-top: 1em;
+    padding-bottom: 1em;
+}
+
+.slides-root > * > div {
+    padding: 1em;
+}
+
+.signposting {
+    gap: 1em;
+}
+
+.slides-root > * > footer {
+    height: 10%;
+
+    padding-top: 0.25em;
+    padding-bottom: 0.25em;
+}
+
+.slides-root > * > footer > hr {
+    margin-top: 0.2em;
+    margin-bottom: 0.2em;
+}
+
+.slides-root .slides-overlay {
+    position: absolute;
+}
+
+.slides-root > .slides-standout {
+    background-color: var(--header-back-color);
+    /* filter: invert(100%); */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+    background-color: rgb(from var(--header-back-color) calc(255 - r) calc(255 - g) calc(255 - b));
+    color: white;
+}
+
+.title-block {
+    padding-left: 10%;
+    padding-right: 10%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+.title-block h1 {
+    margin: 0;
+}
+
+.title-block h2 {
+    margin: 0;
+    font-weight: inherit;
+}
+
+.slides-root > .slides-end {
+    padding: 10%;
+}
+
+.rule {
+    width: 100%;
+    border-top: 0.0375em solid var(--header-back-color);
+}
+
+.sidebox {
+    top: 2em;
+    right: 2em;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+.sidebox.bot {
+    top: unset !important;
+    bottom: 2em
+}
+
+.sidebox > div {
+    border: 1px solid black;
+    width: fit-content;
+}
+
+.aside {
+    margin: 1em 0 1em 0;
+    padding: 0.25em;
+    background-color: var(--aside-color);
+
+    border: 1px solid black;
+    box-sizing: border-box;
+}
+
+.attention {
+    margin: 1em 0 1em 0;
+    padding: 0.25em;
+    background-color: var(--attention-color);
+
+    border: 1px solid black;
+    box-sizing: border-box;
+}
+
+.insight {
+    margin: 1em 0 1em 0;
+    padding: 0.25em;
+    background-color: var(--insight-color);
+    font-weight: bold;
+
+    border: 1px solid black;
+    box-sizing: border-box;
+}
+
+.table-hhead {
+    border-bottom: 0.0625em solid black;
+}
+
+.box {
+    padding: 0.5em;
+}
+
+code {
+    font-family: 'monospace';
+    /* font-family: 'Fira Code'; */
+}
+
+p {
+    margin: 0.1em 0.25em 0.5em;
+}
+
+table {
+    border-collapse: collapse;
+    margin: 0 auto;
+}
+
+th, td {
+    padding: 0 1em 0 1em;
+}
+
+ol, ul {
+    margin: 0.5em 0 0.5em 0;
+    padding-left: 2em;
+}
+
+pre {
+    margin: 0;
+    padding: 0.5em;
+    background-color: var(--code-bg-color);
+}
+
+.compact-list {
+    display: flex;
+    list-style-position: inside;
+    gap: 1em;
+    padding-left: 0.5em;
+}
+
+.compact-list > li {
+    width: fit-content;
+}
+
+.code-comp {
+    display: flex;
+    flex-direction: row;
+    gap: 2%;
+}
+
+.justification {
+    font-style: italic;
+}
+.justification:before {
+    content: ', ';
+}
+.justification:after {
+    content: ',';
+}
+
+.comment {
+    font-weight: bold;
+    float: right;
+}
+
+.cite {
+    font-style: italic;
+    padding-left: 0.5em;
+    margin-left: 0.15em;
+    border-left: 0.1em solid var(--cite-color);
+}
+.citee {
+    float: right;
+    align-self: flex-end;
+}
+
+@media print {
+    .slides-root {
+        width: 1600px;
+    }
+
+    /* .slides-root > * {
+        border: unset!;
+    } */
+}
+
+@page {
+    /* size: 297mm 167.0625mm; */
+    size: 1600px 900px;
+    margin: 0;
+}

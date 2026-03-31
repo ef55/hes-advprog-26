@@ -1,0 +1,39 @@
+(melange.emit
+ (target main)
+ (alias main)
+ (package hes-gadts)
+ (module_systems (esm js))
+ (libraries slides)
+ (preprocess (pps melange.ppx)))
+
+(rule
+ (target import_map.json)
+ (action (no-infer (progn
+  (write-file import_map.json
+   "\| {
+   "\|   "imports": {
+   "\|     "melange/": "./main/node_modules/melange/",
+   "\|     "melange.js/": "./main/node_modules/melange.js/",
+   "\|     "melange.belt/": "./main/node_modules/melange.belt/",
+   "\|     "melange.dom/": "./main/node_modules/melange.dom/",
+   "\|     "slides/": "./main/node_modules/slides/",
+   "\|     "slides.dom/": "./main/node_modules/slides.dom/"
+   "\|   }
+   "\| }
+  )))))
+
+(rule
+ (mode (promote (until-clean)))
+ (target slides.js)
+ (deps
+  (alias main)
+  (:entrypoint (file main/hes-gadts/main.js))
+  (:config (file import_map.json))
+ )
+ (action (no-infer (progn
+  (run deno bundle --platform=browser --format=esm --import-map %{config} ./%{entrypoint} --output %{target})))))
+
+(rule
+ (mode (promote (until-clean)))
+ (action (progn
+  (copy %{bin:server.js} server.js))))

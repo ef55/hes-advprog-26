@@ -1,0 +1,8 @@
+.scala-kw {
+    color: #272727;
+    font-weight: bold;
+}
+
+.scala-comment {
+    color: rgb(16, 75, 16);
+}
