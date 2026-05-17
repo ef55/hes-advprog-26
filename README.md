@@ -2,12 +2,12 @@
 
 ## Context
 
-Date: 11.05.2026
-Duration: 1h30
-University: HES-SO (Lausanne campus)
-Level: Master
-Course: Advanced Programming Paradigms
-Instructor: Jean-Paul Calbimonte
+- Date: 11.05.2026
+- Duration: 1h30
+- University: HES-SO (Lausanne campus)
+- Level: Master
+- Course: Advanced Programming Paradigms
+- Instructor: Jean-Paul Calbimonte
 
 ## Slides
 
