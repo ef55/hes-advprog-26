@@ -1,3 +1,5 @@
+package Tree
+
 object OOP {
 
   trait Tree[T] {
@@ -26,11 +28,11 @@ object OOP {
   def map[S, T](t: Tree[S], f: S => T): Tree[T] =
     if t.isLeaf
     then
+      Leaf(f(t.get))
+    else
       val l1 = map(t.left, f)
       val r1 = map(t.right, f)
       Fork(l1, r1)
-    else
-      Leaf(f(t.get))
 
   @main
   def testOOP =

@@ -39,6 +39,12 @@ Pacing:
   the original code.
 - [`SmartArray`](code/SmartArray.scala) (slide 50) was written live.
 - [`RBTree`](code/RBTree.scala) (slide 63) was written live.
+- [`TreeBench`](code/TreeBench.scala) was not shown in class.
+  It implements the benchmarks used in the lecture (slide 30)
+  and can run using
+  ```
+  scala --jmh .
+  ```
 
 (Most) comments were added after the lecture.
 
