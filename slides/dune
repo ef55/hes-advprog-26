@@ -27,7 +27,7 @@
  (target slides.js)
  (deps
   (alias main)
-  (:entrypoint (file main/hes-gadts/main.js))
+  (:entrypoint (file main/slides/main.js))
   (:config (file import_map.json))
  )
  (action (no-infer (progn

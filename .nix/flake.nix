@@ -15,6 +15,7 @@
       {
         devShells.default = pkgs.mkShell {
           nativeBuildInputs = with pkgs; [
+            # Slides
             ocaml
             dune_3
             ocamlPackages.findlib
@@ -22,8 +23,10 @@
             ocamlPackages.melange
             slides-lib.packages.${system}.slides
             slides-lib.packages.${system}.server
-
             deno
+
+            # Scala code
+            scala-next
           ];
           buildInputs = with pkgs; [ ocamlPackages.melange ];
         };

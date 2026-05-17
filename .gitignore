@@ -3,3 +3,7 @@ _build/
 .envrc
 
 .vscode
+
+.metals/
+.bsp/
+.scala-build/
