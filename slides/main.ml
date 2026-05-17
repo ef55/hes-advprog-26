@@ -19,7 +19,9 @@ let setup_controls (ctr: controls): unit =
   );
   add_event_listener "hashchange" (fun _ ->
     int_of_string_opt (get_hash ()) |> Option.value ~default:0 |> ctr.goto;
-  )
+  );
+  add_event_listener "beforeprint" (fun _ -> ctr.set_mode Print);
+  add_event_listener "afterprint" (fun _ -> ctr.set_mode Presentation)
 
 let init () =
   let data = Belt.Map.String.fromArray [|

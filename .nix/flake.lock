@@ -96,11 +96,11 @@
       },
       "locked": {
         "dir": ".nix",
-        "lastModified": 1779038086,
-        "narHash": "sha256-zRAam8Q2QtMKfX9V/zuqGvn8TeYwHnjRjcQ3B/GTUBU=",
+        "lastModified": 1779049008,
+        "narHash": "sha256-no85Dt48ZNhtZ7NVFDhuCSOmkmpjQg8GnK52ONNqJi0=",
         "ref": "refs/heads/main",
-        "rev": "7aa4fa4067e1a2a98bf624657f0d430bd7b93b09",
-        "revCount": 36,
+        "rev": "f46ce04ff6a1d265234cebcbce9d15c9ec7a51ec",
+        "revCount": 38,
         "type": "git",
         "url": "https://git.ef5.ch/Ef5/slides-lib"
       },
