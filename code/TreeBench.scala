@@ -1,10 +1,9 @@
+//> using dep "org.openjdk.jmh:jmh-core:1.37"
 package TreeBench
 
 import scala.util.Random
 import org.openjdk.jmh.annotations.{Fork => _, *}
 import java.util.concurrent.TimeUnit
-
-// import Tree.ADT.*
 
 val seed = 0;
 val size = 1000000;
